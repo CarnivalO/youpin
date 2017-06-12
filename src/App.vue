@@ -1,13 +1,11 @@
 <template>
   <div id="app">
-    <Header></Header>
     <Swipe></Swipe>
     <List></List>
   </div>
 </template>
 
 <script>
-import Header from '@/components/Header'
 import Swipe from '@/components/Swipe'
 import List from '@/components/List'
 
@@ -15,8 +13,7 @@ export default {
   name: 'app',
   components: {
     Swipe,
-    List,
-    Header
+    List
   }
 }
 </script>

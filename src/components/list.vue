@@ -2,22 +2,23 @@
   <div>
     <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange">
       <ul>
-        <li>
+        <li v-for="(list,index) in lists" :key="list.id">
           <div class="listHeader">
-            <img class="avatar" src="../assets/raw_1495871170.jpeg" />
-            <span class="username">昵称昵称</span>
-            <span class="postTime">1小时</span>
+            <img class="avatar" :src="list.avatar" />
+            <span class="username">{{list.username}}</span>
+            <span class="postTime">{{list.postTime}}</span>
           </div>
           <div class="listBody">
             <p class="content">
-              #美物推荐#YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看YSL好看好看真好看
-              <a href="#">查看详情</a>
+              {{list.content}}
+              <a :href="list.detail">查看详情</a>
             </p>
-            <img class="contentImg" src="https://modao.cc/uploads3/images/1015/10155658/raw_1496978376.jpeg" />
+            <img v-for="img1 in list.contentImgs" :src="img1" />
+            <div class="clear"></div>
           </div>
           <div class="listFooter">
-            <button class="like listButton" @click="like()">点赞
-              <span class="likeCount">{{likeCount}}</span>
+            <button class="like listButton" @click="like(index)">点赞
+              <span class="likeCount">{{likes[index].likeCount}}</span>
             </button>
             <button class="buy listButton">购买</button>
           </div>
@@ -36,41 +37,47 @@ import axios from 'axios'
 import { Loadmore } from 'mint-ui'
 
 export default {
-  data () {
+  name: 'List',
+  data() {
     return {
-      likeStatus: true,
-      likeCount: 0,
-      list: [],
+      lists: [],
+      likes: [],
       topStatus: ''
     }
   },
+  created() {
+    axios.get('http://www.easy-mock.com/mock/593c185c8ac26d795fd2a68a/youpin/getList')
+      .then(response => {
+        this.lists = response.data
+        for (let x in response.data) {
+          let obj = {
+            'likeStatus': false,
+            'likeCount': response.data[x].likeCount
+          }
+          this.likes.push(obj)
+        }
+      })
+      .catch(error => {
+        console.log(error)
+        alert('网络错误，不能访问')
+      })
+  },
   methods: {
-    handleTopChange (status) {
+    handleTopChange(status) {
       this.topStatus = status
     },
     loadTop: {},
-    like: function () {
-      if (this.likeStatus) {
-        this.likeStatus = !this.likeStatus
-        this.likeCount++
+    like: function (index) {
+      if (this.likes[index].likeStatus) {
+        this.likes[index].likeStatus = !this.likes[index].likeStatus
+        this.likes[index].likeCount--
       } else {
-        this.likeStatus = !this.likeStatus
-        this.likeCount--
+        this.likes[index].likeStatus = !this.likes[index].likeStatus
+        this.likes[index].likeCount++
       }
     },
-    created () {
-      axios.get('http://www.easy-mock.com/mock/593c185c8ac26d795fd2a68a/youpin/getImgs')
-        .then(response => {
-          console.log(response)
-          this.imgs = response.data
-        })
-        .catch(error => {
-          console.log(error)
-          alert('网络错误，不能访问')
-        })
-    },
     components: {
-      Loadmore
+      'mt-loadmore': Loadmore
     }
   }
 }
@@ -79,11 +86,18 @@ export default {
 <style scoped>
 a {
   text-decoration: none;
+  color: #A86500;
+}
+
+.clear {
+  clear: both;
+  height: 0px;
 }
 
 .listHeader {
-  margin: 0 0 0.3em 0;
+  margin: 0.3em 0 0.3em 0;
   height: 2em;
+  clear: both;
 }
 
 .avatar {
@@ -111,16 +125,19 @@ a {
 }
 
 .content {
+  margin: 0 0.6em 0.6em 0.6em;
   text-align: left;
 }
 
-.contentImg {
-  width: 20em;
-  height: 20em;
+.listBody img {
+  width: 48%;
+  height: 48%;
+  float: left;
+  margin: 1%;
 }
 
 .listFooter {
-  display: inline;
+  clear: both;
 }
 
 .listButton {

@@ -1,21 +1,27 @@
 <template>
   <div class="page-swipe">
+    <mt-header title="优品">
+      <mt-button icon="more" slot="right"></mt-button>
+    </mt-header>
     <mt-swipe :auto="4000">
-      <mt-swipe-item v-for="img in imgs"><img :src="img.url"></mt-swipe-item>
-      </mt-swipe>
-    
-    </div>
+      <mt-swipe-item v-for="image in images" :key="image.id">
+        <img :src="image.url">
+      </mt-swipe-item>
+    </mt-swipe>
+  
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { Swipe, SwipeItem } from 'mint-ui'
+import { Header, Swipe, SwipeItem } from 'mint-ui'
 
 export default {
+  name: 'Swipe',
   created () {
     axios.get('http://www.easy-mock.com/mock/593c185c8ac26d795fd2a68a/youpin/getImgs')
       .then(response => {
-        this.imgs = response.data
+        this.images = response.data
       })
       .catch(error => {
         console.log(error)
@@ -24,12 +30,13 @@ export default {
   },
   data () {
     return {
-      imgs: []
+      images: []
     }
   },
   components: {
-    Swipe,
-    SwipeItem
+    'mt-swipe': Swipe,
+    'mt-swipe-item': SwipeItem,
+    'mt-header': Header
   }
 }
 
@@ -40,7 +47,8 @@ export default {
   height: 200px;
   text-align: center;
 }
-.mint-swipe img{
+
+.mint-swipe img {
   width: 100%;
 }
 </style>
